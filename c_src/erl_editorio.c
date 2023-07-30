@@ -70,17 +70,13 @@ ERL_NIF_TERM key_to_elixir(ErlNifEnv *env, int code)
         if (code == mapping[i].code)
             return enif_make_atom(env, mapping[i].atom);
     }
-
+    
     // If no other option.
     return enif_make_int(env, code);
 }
 
 static ERL_NIF_TERM getch_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    cbreak();
-    noecho();
     int ch = getch();
-    nocbreak();
-    echo();
     return key_to_elixir(env, ch);
 }
 
@@ -94,12 +90,16 @@ static ERL_NIF_TERM clear_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
 static int load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info)
 {
     WINDOW *win = initscr();
+    // cbreak();
+    // noecho();
     *priv = (void *) win;
     return 0;
 }
 
 static void unload(ErlNifEnv *env, void *priv)
 {
+    // nocbreak();
+    // echo();
     endwin();
 }
 
@@ -108,4 +108,4 @@ static ErlNifFunc nif_funcs[] = {
     {"clear", 0, clear_nif}
 };
 
-ERL_NIF_INIT(ncurses_nif, nif_funcs, load, NULL, NULL, unload)
+ERL_NIF_INIT(erl_editorio, nif_funcs, load, NULL, NULL, unload)
