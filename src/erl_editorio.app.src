@@ -1,0 +1,15 @@
+{application, erl_editorio,
+ [{description, "Minimal functions needed for a text-mode editor in Erlang"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { erl_editorio, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, [erl_editorio]},
+  {maintainers, []},
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
