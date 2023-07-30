@@ -19,8 +19,19 @@ start(_Type, _Args) ->
 stop(_State) ->
     ok.
 
-getch() -> 
+getch_internal() -> 
     erlang:nif_error(nif_not_loaded).
+
+getch() -> 
+    Value = getch_internal(),
+    if
+        Value == timeout ->
+            getch();
+        Value == unknown ->
+            {error, unknown_input};
+        true ->
+            {ok, Value}
+    end.
 
 clear() ->
     erlang:nif_error(nif_not_loaded).
