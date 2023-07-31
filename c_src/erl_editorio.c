@@ -4,13 +4,10 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
+static int epoll_fd;
+static struct epoll_event event;
+
 static ERL_NIF_TERM getch_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    // set up epoll to read a character at a time from stdin
-    int epoll_fd = epoll_create1(STDIN_FILENO);
-    struct epoll_event event;
-    event.events = EPOLLIN;
-    event.data.fd = STDIN_FILENO;
-    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, 0, &event);
     // now read from stdin.  If it's an escape-key sequence, read the rest of the sequence
     // and return the appropriate atom.  Otherwise, return the character.
     // Use read or fread instead of ncurses getch() because getch() doesn't work with epoll.
@@ -95,6 +92,11 @@ static int load(ErlNifEnv *env, void **priv, ERL_NIF_TERM info)
     // cbreak();
     // noecho();
     // *priv = (void *) win;
+    // set up epoll to read a character at a time from stdin
+    epoll_fd = epoll_create1(STDIN_FILENO);
+    event.events = EPOLLIN;
+    event.data.fd = STDIN_FILENO;
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, 0, &event);
     return 0;
 }
 
