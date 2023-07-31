@@ -29,9 +29,14 @@ getch() ->
             getch();
         Value == unknown ->
             {error, unknown_input};
+        erlang:is_atom(Value) ->
+            {ok, Value};
         true ->
-            {ok, Value}
+            {ok, [Value]}
     end.
 
+% clear_internal() ->
+%     erlang:nif_error(nif_not_loaded).
+
 clear() ->
-    erlang:nif_error(nif_not_loaded).
+    io:format("\e[2J\e[H\e[0;0f").
