@@ -7,6 +7,8 @@
 static int epoll_fd;
 static struct epoll_event event;
 
+#define PUNT(c) return enif_make_list2(env, enif_make_atom(env, "unknown"), enif_make_int(env, c));
+
 static ERL_NIF_TERM getch_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     // now read from stdin.  If it's an escape-key sequence, read the rest of the sequence
     // and return the appropriate atom.  Otherwise, return the character.
@@ -52,20 +54,20 @@ static ERL_NIF_TERM getch_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
                                             case '8': // end
                                                 return enif_make_atom(env, "end");
                                             default:
-                                                return enif_make_atom(env, "unknown");
+                                                PUNT(c);
                                         }
                                     } else {
-                                        return enif_make_atom(env, "unknown");
+                                        PUNT(c);
                                     }
                                 } else {
-                                    return enif_make_atom(env, "unknown");
+                                    PUNT(c);
                                 }
                         }
                     } else {
-                        return enif_make_atom(env, "unknown");
+                        PUNT(c);
                     }
                 } else {
-                    return enif_make_atom(env, "unknown");
+                    PUNT(c);
                 }
             } else {
                 ungetc(c, stdin);
@@ -108,7 +110,7 @@ static void unload(ErlNifEnv *env, void *priv)
 }
 
 static ErlNifFunc nif_funcs[] = {
-    {"getch_internal", 0, getch_nif},
+    {"getch_internal", 0, getch_nif}
     // {"clear_internal", 0, clear_nif}
 };
 

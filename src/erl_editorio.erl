@@ -1,7 +1,6 @@
 -module(erl_editorio).
 -behaviour(application).
--export([start/2, stop/1]).
--export([getch/0, clear/0]).
+-export([getch/0, clear/0, start/2, stop/1]).
 -on_load(init/0).
 
 init() ->
@@ -23,16 +22,19 @@ getch_internal() ->
     erlang:nif_error(nif_not_loaded).
 
 getch() -> 
-    Value = getch_internal(),
-    if
-        Value == timeout ->
+    case getch_internal() of
+        timeout ->
             getch();
-        Value == unknown ->
-            {error, unknown_input};
-        erlang:is_atom(Value) ->
-            {ok, Value};
-        true ->
-            {ok, [Value]}
+        [unknown, 126] ->
+            {ok, delete};
+        127 ->
+            {ok, backspace};
+        [unknown, KeyValue] ->
+            {error, unknown_input, KeyValue};
+        V when erlang:is_atom(V) ->
+            {ok, V};
+        V ->
+            {ok, [V]}
     end.
 
 % clear_internal() ->
